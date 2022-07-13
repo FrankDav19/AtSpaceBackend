@@ -14,8 +14,8 @@ export default class Token {
             { expiresIn: this.expiration }
         );
     }
-
-    static comprobarToken(userToken: string) {
+    
+    static verifyToken(userToken: string) {
         return new Promise((resolve, reject) => {
             Jwt.verify(
                 userToken,

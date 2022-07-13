@@ -27,12 +27,12 @@ ASRoutes.post('/create/user', (req: Request, res: Response) => {
         stations: []
     }
 
-    User.create(user).then(userDB => {
+    User.create(user).then(userDB => { 
         const usuarioToken = Token.getJsonWebToken({
             _id: userDB._id,
-            Name: req.body.name,
-            Image: req.body.image,
-            Email: req.body.email,
+            name: req.body.name,
+            image: req.body.image,
+            email: req.body.email,
         });
 
         res.json({
@@ -40,11 +40,11 @@ ASRoutes.post('/create/user', (req: Request, res: Response) => {
             token: usuarioToken
         });
     }).catch(err => {
-        res.json({
+        res.status(400).json({
             ok: false,
             err
         });
     });
-});
+});    
 
 export default ASRoutes;

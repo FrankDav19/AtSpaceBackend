@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 const readingSchema = new Schema(
     {
@@ -10,7 +10,7 @@ const readingSchema = new Schema(
         pm10: { type: Number },
         wDirection: { type: String },
         wSpeed: { type: Number },
-        rainMM: { type: Number }
+        rainMM: { type: Number } 
     },
     { timestamps: true }
 )
@@ -29,7 +29,12 @@ const stationSchema = new Schema(
                 required: true
             }
         },
-        units: ['Imperial', 'Metric'],
+        units: {
+            type: Number,
+            enum: [0, 1],
+            default: 0,
+            required: true
+        },
         readings: [readingSchema]
     },
     { timestamps: true }
@@ -41,18 +46,24 @@ const userSchema = new Schema({
             type: String,
             min: 6,
             max: 255,
-            required: [true, 'El nombre es requerido']
+            required: [true, 'Ingrese su nombre']
         },
         image: {
             type: String,
             default: 'default.png'
+        },
+        username: {
+            type: String,
+            require: true,
+            lowercase: true,
+            required: [true, 'Ingrese un nombre de usuario']
         },
         email: {
             type: String,
             unique: true,
             min: 6,
             max: 1024,
-            required: [true, 'El correo es necesario']
+            required: [true, 'Ingrese su correo electronico']
         },
         password: {
             type: String,
@@ -65,12 +76,50 @@ const userSchema = new Schema({
         }
     },
     uiType: {
-        type: String,
-        enum: ["basic", "advanced"],
+        type: Number,
+        enum: [0, 1],
+        default: 0,
         required: true
     },
     stations: [stationSchema]
 });
+
+enum UiType {
+    Basic = 0,
+    Advanced = 1
+}
+
+enum Units {
+    Metric = 0,
+    Imperial = 1
+}
+
+export interface IUser {
+    name: string,
+    image?: string,
+    username: string,
+    email: string,
+    password: string,
+    uiType: UiType
+}
+
+export interface IStation {
+    name: string,
+    location: Types.Array<number>,
+    units: Units
+}
+
+export interface IReading {
+    humidity?: number,
+    temp?: number,
+    hic?: number,
+    pm1?: number,
+    pm25?: number,
+    pm10?: number,
+    wDirection?: string,
+    wSpeed?: number,
+    rainMM?: number
+}
 
 export const User = model('User', userSchema);
 export const Station = model('Station', stationSchema);
