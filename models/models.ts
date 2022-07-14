@@ -10,7 +10,7 @@ const readingSchema = new Schema(
         pm10: { type: Number },
         wDirection: { type: String },
         wSpeed: { type: Number },
-        rainMM: { type: Number } 
+        rainMM: { type: Number }
     },
     { timestamps: true }
 )
@@ -35,7 +35,10 @@ const stationSchema = new Schema(
             default: 0,
             required: true
         },
-        readings: [readingSchema]
+        readings: [{
+            type: Schema.Types.ObjectId,
+            ref: "Reading"
+          }]
     },
     { timestamps: true }
 );
@@ -69,10 +72,6 @@ const userSchema = new Schema({
             type: String,
             min: 6,
             required: [true, 'La contraseña es obligatoria']
-        },
-        date: {
-            type: Date,
-            default: Date.now
         }
     },
     uiType: {
@@ -81,8 +80,12 @@ const userSchema = new Schema({
         default: 0,
         required: true
     },
-    stations: [stationSchema]
-});
+    stations: [{
+        type: Schema.Types.ObjectId,
+        ref: "Station"
+      }]
+},
+    { timestamps: true });
 
 enum UiType {
     Basic = 0,
