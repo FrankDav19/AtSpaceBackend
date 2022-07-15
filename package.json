@@ -4,7 +4,8 @@
   "description": "Atmospheric Space Backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon dist/"
+    "dev": "nodemon dist/",
+    "test": "node dist/"
   },
   "author": "Francisco Davila",
   "license": "ISC",

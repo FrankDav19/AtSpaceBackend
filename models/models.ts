@@ -72,7 +72,11 @@ const userSchema = new Schema({
             type: String,
             min: 6,
             required: [true, 'La contraseña es obligatoria']
-        }
+        },
+        favorites: [{
+            type: Schema.Types.ObjectId,
+            ref: "Favorite"
+          }]
     },
     uiType: {
         type: Number,

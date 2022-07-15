@@ -3,6 +3,7 @@ import { User, Station, Reading, IReading } from "../models/models";
 import bcrypt from 'bcrypt';
 import Token from "../classes/token";
 import { checkToken } from '../middlewares/auth';
+import { Types } from "mongoose";
 
 // Router instance
 const ASRoutes = Router();
@@ -64,8 +65,13 @@ ASRoutes.post('/create/station', checkToken, (req: any, res: Response) => {
     }
 
     Station.create(station).then(stationDB => {
-        User.findByIdAndUpdate(req.user._id, {$push: { stations: stationDB._id }}, { new: true, useFindAndModify: false }, (err) => {
-            if (err) throw err;
+        User.findByIdAndUpdate(req.user._id, { $push: { stations: stationDB._id } }, { new: true, useFindAndModify: false }, (err) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err: err
+                })
+            };
         });
 
         res.json({
@@ -76,44 +82,83 @@ ASRoutes.post('/create/station', checkToken, (req: any, res: Response) => {
 });
 
 // Add readings
-ASRoutes.post('/create/reading', (req: Request, res: Response) => {
-    const reading : IReading= {
-       humidity: req.body.humidity,
-       hic: req.body.hic,
-       pm1: req.body.pm1,
-       pm10: req.body.pm10,
-       pm25: req.body.pm25,
-       rainMM: req.body.rainMM,
-       temp: req.body.temp,
-       wDirection: req.body.wDirection,
-       wSpeed: req.body.wSpeed
+ASRoutes.put('/add-reading', (req: Request, res: Response) => {
+    const reading: IReading = {
+        humidity: req.body.humidity,
+        hic: req.body.hic,
+        pm1: req.body.pm1,
+        pm10: req.body.pm10,
+        pm25: req.body.pm25,
+        rainMM: req.body.rainMM,
+        temp: req.body.temp,
+        wDirection: req.body.wDirection,
+        wSpeed: req.body.wSpeed
     }
 
-    const stationId = req.get('stationId') || '';
+    const stationId = req.get('stationId');
+
+    if (!stationId) {
+        return res.status(400).json({
+            ok: false,
+            err: "Station ID Missing"
+        })
+    }
 
     Reading.create(reading).then(readingDB => {
-        Station.findByIdAndUpdate(stationId, {$push: { readings : readingDB._id }}, { new: true, useFindAndModify: false }, (err) => {
-            if (err) throw err;
+        Station.findByIdAndUpdate(stationId, { $push: { readings: readingDB._id } }, { new: true, useFindAndModify: false }, (err) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    err: err
+                })
+            };
         });
 
         res.json({
+            ok: true,
             readingID: readingDB._id,
             station: stationId
         });
     });
 });
 
+// Add favorites
+ASRoutes.put('/add-favorite', checkToken, (req: any, res: Response) => {
+    if (!req.body.stationId) {
+        return res.status(400).json({
+            ok: false,
+            err: "Station ID Missing"
+        })
+    }
+
+    var stationId = new Types.ObjectId(req.body.stationId);
+
+    User.findByIdAndUpdate(req.user._id, { $push: { favorites: stationId } }, { safe: true, new: true, upsert: true }, (err, success) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err: err
+            });
+        } else {
+            res.status(200).json({
+                ok: true,
+                success: success
+            })
+        }
+    });
+});
+
 
 //Methods used to retrieve information from the database.
 // User Login
-ASRoutes.post('/login', (req: Request, res: Response) => {
+ASRoutes.get('/login', (req: Request, res: Response) => {
     User.findOne({ email: req.body.email }, (err: any, userDB: any) => {
         if (err) throw err;
 
         if (!userDB) {
             return res.json({
                 ok: false,
-                mensaje: 'Usuario inexistente',
+                mensaje: 'User not found',
             });
         };
 
@@ -133,10 +178,21 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
         } else {
             return res.json({
                 ok: false,
-                mensaje: 'Usuario y/o constraseña incorrectos'
+                mensaje: 'Wrong email/password'
             });
         }
     });
+});
+
+// Get all the stations
+ASRoutes.get('/stations/all', (req: Request, res: Response) => {
+    Station.find({})
+        .then((stations)=>{
+            res.status(200).json({
+                ok: true,
+                stations: stations
+            });
+        });    
 });
 
 export default ASRoutes;
