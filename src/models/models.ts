@@ -1,20 +1,5 @@
 import { Schema, model, Types } from "mongoose";
 
-const readingSchema = new Schema(
-    {
-        humidity: { type: Number },
-        temp: { type: Number },
-        hic: { type: Number },
-        pm1: { type: Number },
-        pm25: { type: Number },
-        pm10: { type: Number },
-        wDirection: { type: String },
-        wSpeed: { type: Number },
-        rainMM: { type: Number }
-    },
-    { timestamps: true }
-)
-
 const stationSchema = new Schema(
     {
         name: { type: String },
@@ -36,9 +21,16 @@ const stationSchema = new Schema(
             required: true
         },
         readings: [{
-            type: Schema.Types.ObjectId,
-            ref: "Reading"
-          }]
+            humidity: { type: Number },
+            temp: { type: Number },
+            hic: { type: Number },
+            pm1: { type: Number },
+            pm25: { type: Number },
+            pm10: { type: Number },
+            wDirection: { type: String },
+            wSpeed: { type: Number },
+            rainMM: { type: Number }
+        }]
     },
     { timestamps: true }
 );
@@ -76,7 +68,7 @@ const userSchema = new Schema({
         favorites: [{
             type: Schema.Types.ObjectId,
             ref: "Favorite"
-          }]
+        }]
     },
     uiType: {
         type: Number,
@@ -87,7 +79,7 @@ const userSchema = new Schema({
     stations: [{
         type: Schema.Types.ObjectId,
         ref: "Station"
-      }]
+    }]
 },
     { timestamps: true });
 
@@ -114,20 +106,19 @@ export interface IStation {
     name: string,
     location: Types.Array<number>,
     units: Units
+    readings?: [{
+        humidity?: number,
+        temp?: number,
+        hic?: number,
+        pm1?: number,
+        pm25?: number,
+        pm10?: number,
+        wDirection?: string,
+        wSpeed?: number,
+        rainMM?: number
+    }]
 }
 
-export interface IReading {
-    humidity?: number,
-    temp?: number,
-    hic?: number,
-    pm1?: number,
-    pm25?: number,
-    pm10?: number,
-    wDirection?: string,
-    wSpeed?: number,
-    rainMM?: number
-}
 
 export const User = model('User', userSchema);
 export const Station = model('Station', stationSchema);
-export const Reading = model('Reading', readingSchema);

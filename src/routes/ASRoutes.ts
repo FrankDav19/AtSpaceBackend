@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { User, Station, Reading, IReading } from "../models/models";
+import { User, Station, IStation, IUser } from "../models/models";
 import bcrypt from 'bcrypt';
 import Token from "../classes/token";
 import { checkToken } from '../middlewares/auth';
@@ -83,7 +83,7 @@ ASRoutes.post('/create/station', checkToken, (req: any, res: Response) => {
 
 // Add readings
 ASRoutes.put('/add-reading', (req: Request, res: Response) => {
-    const reading: IReading = {
+    const reading = {
         humidity: req.body.humidity,
         hic: req.body.hic,
         pm1: req.body.pm1,
@@ -104,22 +104,21 @@ ASRoutes.put('/add-reading', (req: Request, res: Response) => {
         })
     }
 
-    Reading.create(reading).then(readingDB => {
-        Station.findByIdAndUpdate(stationId, { $push: { readings: readingDB._id } }, { new: true, useFindAndModify: false }, (err) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err: err
-                })
-            };
-        });
 
-        res.json({
-            ok: true,
-            readingID: readingDB._id,
-            station: stationId
-        });
+    Station.findByIdAndUpdate(stationId, { $push: { readings: reading } }, { new: true, useFindAndModify: false }, (err) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err: err
+            })
+        };
     });
+
+    res.json({
+        ok: true,
+        station: stationId
+    });
+
 });
 
 // Add favorites
@@ -133,7 +132,8 @@ ASRoutes.put('/add-favorite', checkToken, (req: any, res: Response) => {
 
     var stationId = new Types.ObjectId(req.body.stationId);
 
-    User.findByIdAndUpdate(req.user._id, { $push: { favorites: stationId } }, { safe: true, new: true, upsert: true }, (err, success) => {
+
+    User.findByIdAndUpdate(req.user._id, { $push: { favorites: stationId } }, { new: true, upsert: true }, (err, success) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -152,13 +152,19 @@ ASRoutes.put('/add-favorite', checkToken, (req: any, res: Response) => {
 //Methods used to retrieve information from the database.
 // User Login
 ASRoutes.get('/login', (req: Request, res: Response) => {
+    if (!req.body.email || !req.body.password) {
+        return res.json({
+            ok: false,
+            mensaje: 'Insert email or password'
+        });
+    }
+
     User.findOne({ email: req.body.email }, (err: any, userDB: any) => {
-        if (err) throw err;
 
         if (!userDB) {
             return res.json({
                 ok: false,
-                mensaje: 'User not found',
+                mensaje: 'User not found'
             });
         };
 
@@ -178,7 +184,7 @@ ASRoutes.get('/login', (req: Request, res: Response) => {
         } else {
             return res.json({
                 ok: false,
-                mensaje: 'Wrong email/password'
+                mensaje: 'Wrong email or password'
             });
         }
     });
@@ -187,12 +193,12 @@ ASRoutes.get('/login', (req: Request, res: Response) => {
 // Get all the stations
 ASRoutes.get('/stations/all', (req: Request, res: Response) => {
     Station.find({})
-        .then((stations)=>{
+        .then((stations) => {
             res.status(200).json({
                 ok: true,
                 stations: stations
             });
-        });    
+        });
 });
 
 export default ASRoutes;
