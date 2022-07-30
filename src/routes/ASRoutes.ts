@@ -192,7 +192,7 @@ ASRoutes.get('/login', (req: Request, res: Response) => {
 
 // Get all the stations
 ASRoutes.get('/stations/all', (req: Request, res: Response) => {
-    Station.find({})
+    Station.find({}).select('readings').slice('readings', -1)
         .then((stations) => {
             res.status(200).json({
                 ok: true,
@@ -201,4 +201,11 @@ ASRoutes.get('/stations/all', (req: Request, res: Response) => {
         });
 });
 
+ASRoutes.get('/stations/:id', (req: Request, res: Response)=>{
+    Station.find({_id: req.params.id}).then((station)=>{
+        res.status(200).json({
+            station
+        })
+    })
+})
 export default ASRoutes;
