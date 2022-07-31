@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
-app.use('/atspace', ASRoutes);
+app.use('/ASAPI', ASRoutes);
 
 // Mongo connection
 mongoose.connect(MONGODB_URI, (err) => {

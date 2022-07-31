@@ -201,11 +201,26 @@ ASRoutes.get('/stations/all', (req: Request, res: Response) => {
         });
 });
 
-ASRoutes.get('/stations/:id', (req: Request, res: Response)=>{
-    Station.find({_id: req.params.id}).then((station)=>{
-        res.status(200).json({
-            station
-        })
-    })
+ASRoutes.get('/stations/:id', (req: Request, res: Response) => {
+    Station.findOne({ _id: req.params.id }).select('readings').slice('readings', -1)
+        .then((station) => {
+            res.status(200).json({
+                ok: true,
+                station: station
+            });
+        }).catch(err => {
+            if (err.name == 'CastError') {
+                res.status(400).json({
+                    ok: false,
+                    error: 'Invalid Station ID'
+                });
+
+            } else {
+                res.status(400).json({
+                    ok: false,
+                    error: err
+                });
+            }
+        });
 })
 export default ASRoutes;
