@@ -151,40 +151,40 @@ ASRoutes.put('/add-favorite', checkToken, (req: any, res: Response) => {
 
 //Methods used to retrieve information from the database.
 // User Login
-ASRoutes.get('/login', (req: Request, res: Response) => {
+ASRoutes.post('/login', (req: Request, res: Response) => {
     if (!req.body.email || !req.body.password) {
-        return res.json({
+        return res.status(400).json({
             ok: false,
-            mensaje: 'Insert email or password'
+            err: 'Insert email or password'
         });
     }
 
     User.findOne({ email: req.body.email }, (err: any, userDB: any) => {
 
         if (!userDB) {
-            return res.json({
+            return res.status(400).json({
                 ok: false,
-                mensaje: 'User not found'
+                err: 'User not found'
             });
         };
 
         if (bcrypt.compareSync(req.body.password, userDB.userData.password)) {
-            const usuarioToken = Token.getJsonWebToken({
+            const usuarioToken = {
                 _id: userDB._id,
                 name: userDB.userData.name,
                 username: userDB.userData.username,
                 image: userDB.userData.image,
                 email: req.body.email
-            });
+            };
 
-            res.json({
+            res.status(200).json({
                 ok: true,
                 token: usuarioToken
             });
         } else {
-            return res.json({
+            return res.status(400).json({
                 ok: false,
-                mensaje: 'Wrong email or password'
+                err: 'Wrong email or password'
             });
         }
     });
