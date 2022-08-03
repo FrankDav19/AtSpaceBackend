@@ -162,7 +162,7 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
     console.log(req);
     
 
-    User.findOne({ email: req.body.email }, (err: any, userDB: any) => {
+    User.findOne({ 'userData.email': req.body.email }, (err: any, userDB: any) => {
 
         console.log(userDB);
         
