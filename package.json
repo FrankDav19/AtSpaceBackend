@@ -4,7 +4,9 @@
   "description": "Atmospheric Space Backend",
   "main": "index.js",
   "scripts": {
+    "tsc": "./node_modules/typescript/bin/tsc",
     "dev": "nodemon dist/",
+    "build": "tsc",
     "start": "node dist/index.js",
     "postinstall": "tsc"
   },
