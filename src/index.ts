@@ -10,17 +10,18 @@ import ASRoutes from './routes/ASRoutes';
 
 const app = express();
 const server = http.createServer(app);
-const httpServer = server.listen(3010);
+const port: string|number = process.env.PORT || 5000;
+const httpServer = server.listen(port);
 
 const io = new webSocketServer(httpServer,  {
     cors: {
-      origin: "http://localhost:8100"
+      origin: "*"
     }
   });
   
 sockets(io);
 
-console.log('Servidor corriendo en el puerto 3010');
+console.log(`Servidor corriendo en el puerto ${port}`);
 
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
