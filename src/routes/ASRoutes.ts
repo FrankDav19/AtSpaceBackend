@@ -158,15 +158,9 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
             err: 'Insert email or password'
         });
     }
-
-    console.log(req);
-    
-
+  
     User.findOne({ 'userData.email': req.body.email }, (err: any, userDB: any) => {
-
-        console.log(userDB);
-        
-
+    
         if (!userDB) {
             return res.status(400).json({
                 ok: false,
@@ -192,11 +186,6 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
                 ok: false,
                 err: 'Wrong email or password'
             });
-        }
-
-        if(err){
-         console.log(err);
-         
         }
     });
 });
