@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "postinstall": "tsc"
   },
+  "engines": { "node": "16.13.2" },
   "author": "Francisco Davila",
   "license": "ISC",
   "dependencies": {
