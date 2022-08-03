@@ -159,7 +159,13 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
         });
     }
 
+    console.log(req);
+    
+
     User.findOne({ email: req.body.email }, (err: any, userDB: any) => {
+
+        console.log(userDB);
+        
 
         if (!userDB) {
             return res.status(400).json({
@@ -186,6 +192,11 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
                 ok: false,
                 err: 'Wrong email or password'
             });
+        }
+
+        if(err){
+         console.log(err);
+         
         }
     });
 });
