@@ -169,7 +169,7 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
         };
 
         if (bcrypt.compareSync(req.body.password, userDB.userData.password)) {
-            const usuarioToken = {
+            const userData = {
                 _id: userDB._id,
                 name: userDB.userData.name,
                 username: userDB.userData.username,
@@ -177,9 +177,12 @@ ASRoutes.post('/login', (req: Request, res: Response) => {
                 email: req.body.email
             };
 
+            const jwt = Token.getJsonWebToken(userData);
+
             res.status(200).json({
                 ok: true,
-                token: usuarioToken
+                userData: userData,
+                token: jwt
             });
         } else {
             return res.status(400).json({
