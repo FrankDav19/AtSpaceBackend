@@ -26,7 +26,7 @@ console.log(`Servidor corriendo en el puerto ${port}`);
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({origin: "*"}));
 
 // Routes
 app.use('/ASAPI', ASRoutes);
